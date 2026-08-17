@@ -1,0 +1,10 @@
+# Values kept intentionally small for a local kind cluster.
+# Do not put credentials or production overrides in this file.
+grafana:
+  enabled: true
+
+prometheus:
+  enabled: true
+
+alertmanager:
+  enabled: true

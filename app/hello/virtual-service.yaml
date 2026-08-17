@@ -1,0 +1,25 @@
+apiVersion: networking.istio.io/v1beta1
+kind: VirtualService
+metadata:
+  name: hello
+  namespace: demo
+spec:
+  hosts:
+    - hello.demo.svc.cluster.local
+  http:
+    - match:
+        - headers:
+            x-version:
+              exact: v2
+      route:
+        - destination:
+            host: hello.demo.svc.cluster.local
+            subset: v2
+            port:
+              number: 8080
+    - route:
+        - destination:
+            host: hello.demo.svc.cluster.local
+            subset: v1
+            port:
+              number: 8080

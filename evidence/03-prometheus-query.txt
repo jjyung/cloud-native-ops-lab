@@ -1,0 +1,5 @@
+# Prometheus query evidence
+# Fill this file with the query, timestamp, and a short result summary.
+
+Suggested query:
+sum by (namespace) (kube_pod_info)

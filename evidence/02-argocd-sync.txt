@@ -1,0 +1,7 @@
+# Argo CD sync evidence
+# Fill this file with the date, Git commit, and observed application states.
+
+Expected states to capture:
+- Synced / Healthy
+- OutOfSync after a Git change
+- Synced again after the manual sync or revert

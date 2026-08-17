@@ -1,0 +1,6 @@
+# Istio routing evidence
+# Fill this file with the date, commands, and actual output after the lab is run.
+
+Expected:
+- request without x-version header -> hello-v1
+- request with x-version: v2 -> hello-v2

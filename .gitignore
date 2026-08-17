@@ -1,0 +1,10 @@
+.DS_Store
+*.log
+
+# Local credentials and generated Kubernetes configuration.
+kubeconfig*
+*.kubeconfig
+.env
+
+# Grafana exports can contain environment-specific metadata or secrets.
+evidence/*-export.json
