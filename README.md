@@ -4,6 +4,74 @@
 
 這個 repo 的目標是驗證基本操作與故障排查方向，不是建立 production-grade 平台。Lab 使用 Docker Desktop、kind Kubernetes cluster，以及 Helm 安裝 `kube-prometheus-stack`。
 
+## 全局架構圖
+
+```mermaid
+flowchart LR
+    Git["Git repository\napp/hello manifests"]
+
+    subgraph Host["Developer machine"]
+        Docker["Docker Desktop"]
+        Kind["kind"]
+        Kubectl["kubectl"]
+        Helm["Helm"]
+        Istioctl["istioctl"]
+    end
+
+    Docker --> Kind
+
+    subgraph Cluster["kind Kubernetes cluster"]
+        Argo["Argo CD\nApplication"]
+
+        subgraph Demo["demo namespace"]
+            Rules["VirtualService\nDestinationRule"]
+            Service["hello Service:8080"]
+            V1["hello-v1 Pod\napp + Envoy"]
+            V2["hello-v2 Pod\napp + Envoy"]
+        end
+
+        subgraph Monitoring["monitoring namespace"]
+            Prom["Prometheus\nscrape + PromQL"]
+            Grafana["Grafana\ndashboard panel"]
+        end
+
+        Istiod["Istio control plane\nistiod"]
+    end
+
+    Kind --> Cluster
+    Kubectl --> Cluster
+    Helm --> Monitoring
+    Istioctl --> Istiod
+    Git -->|desired state| Argo
+    Argo -->|sync app/hello| Demo
+    Istiod -->|configure proxies| Rules
+    Rules --> Service
+    Service --> V1
+    Service --> V2
+    Demo -->|metrics| Prom
+    Prom -->|datasource| Grafana
+```
+
+這張圖的閱讀順序是：Docker 提供執行環境，kind 建立 Kubernetes；Git 保存 desired state，Argo CD 將 `app/hello` sync 到 cluster；Istio/Envoy 負責流量規則；Prometheus 收集 metrics，Grafana 將查詢結果視覺化。`kubectl`、Helm、`istioctl` 則是操作這些元件的 CLI。
+
+## 元件導覽
+
+先從 [Kubernetes](kubernetes.md) 了解共同平台，再依序閱讀執行環境、設定、流量、交付與監控：
+
+| 層次 | 元件 | 本專案文件 |
+|---|---|---|
+| Version control | Git | [git.md](git.md) |
+| Container runtime | Docker / Docker Desktop | [docker.md](docker.md) |
+| Cluster | Kubernetes | [kubernetes.md](kubernetes.md) |
+| Cluster lifecycle | kind | [kind.md](kind.md) |
+| Cluster CLI | kubectl | [kubectl.md](kubectl.md) |
+| Manifest composition | Kustomize | [kustomize.md](kustomize.md) |
+| Package installation | Helm | [helm.md](helm.md) |
+| Traffic management | Istio / istioctl / Envoy | [istio.md](istio.md) |
+| GitOps delivery | Argo CD | [argocd.md](argocd.md) |
+| Metrics | Prometheus | [prometheus.md](prometheus.md) |
+| Visualization | Grafana | [grafana.md](grafana.md) |
+
 ## Lab 架構
 
 ```text
@@ -24,6 +92,17 @@ Docker Desktop
 ```text
 cloud-native-ops-lab/
 ├─ README.md
+├─ git.md
+├─ docker.md
+├─ kubernetes.md
+├─ kubectl.md
+├─ kind.md
+├─ kustomize.md
+├─ helm.md
+├─ istio.md
+├─ argocd.md
+├─ prometheus.md
+├─ grafana.md
 ├─ app/
 │  └─ hello/
 │     ├─ namespace.yaml
