@@ -118,6 +118,163 @@ Argo CD 確實有一些監控與資安治理的意味，但它監控的核心是
 
 三者分工不同；`kubectl apply -k app/hello` 是 fallback 或初次驗證，不是 GitOps demo 的主要路徑。
 
+## 常用指令
+
+### 本 lab 的操作方式
+
+本機目前沒有安裝 `argocd` CLI，因此本 lab 使用：
+
+```text
+kubectl -> 安裝 Argo CD、建立 Application、查看 Kubernetes resources
+Argo CD UI -> 登入、查看 Application、執行 Refresh / Sync
+```
+
+`argocd` CLI 是可選的 client，不是 Argo CD server 運作的必要元件。
+
+### 透過 UI 登入 Argo CD
+
+先將 Argo CD server 暴露到本機：
+
+```bash
+kubectl port-forward svc/argocd-server -n argocd 8080:443
+```
+
+瀏覽器開啟：
+
+```text
+https://localhost:8080
+```
+
+使用者名稱通常是 `admin`。Local lab 的初始 password 可透過 Kubernetes Secret 查詢：
+
+```bash
+kubectl -n argocd get secret argocd-initial-admin-secret \
+  -o jsonpath="{.data.password}" | base64 -d; echo
+```
+
+### 用 kubectl 查看 Application
+
+```bash
+# 列出所有 Application
+kubectl get application -n argocd
+
+# 查看 hello 的 spec、sync status 與 health status
+kubectl get application hello -n argocd -o yaml
+
+# 查看 Application events 與 conditions
+kubectl describe application hello -n argocd
+```
+
+### Refresh 與 Sync
+
+不使用 CLI 時，推薦透過 Argo CD UI 執行：
+
+```text
+Applications -> hello -> Refresh
+Applications -> hello -> Sync
+```
+
+也可以用 annotation 觸發 Application refresh：
+
+```bash
+# 重新檢查 Git revision 與 cluster 狀態
+kubectl annotate application hello -n argocd \
+  argocd.argoproj.io/refresh=hard --overwrite
+```
+
+### Diff、Sync 與等待 rollout
+
+在 UI 中可以查看：
+
+```text
+hello -> APP DIFF：查看 Git desired state 與 live state 差異
+hello -> SYNC：將 Git desired state 同步到 Kubernetes
+```
+
+Sync 後用 `kubectl` 確認 workload：
+
+```bash
+kubectl rollout status deployment/hello-v1 -n demo
+kubectl rollout status deployment/hello-v2 -n demo
+kubectl get deployment,pod -n demo -o wide
+```
+
+`kubectl rollout status` 觀察的是 Kubernetes rollout，不是 Argo CD CLI；Argo CD 會讀取結果並更新 Application health。
+
+### 可選：安裝 Argo CD CLI
+
+如果日後需要 terminal workflow，可以另外安裝 `argocd` CLI：
+
+```bash
+brew install argocd
+argocd login localhost:8080 --insecure
+```
+
+安裝後可使用：
+
+```bash
+argocd app list
+argocd app get hello
+argocd app refresh hello
+argocd app diff hello
+argocd app sync hello
+argocd app wait hello --sync --health
+```
+
+CLI 是操作 Argo CD 的便利介面；沒有安裝 CLI 不會影響 Argo CD controller 在 cluster 中運作。
+
+### 使用 CLI 時的手動 sync 流程
+
+若日後安裝 CLI，這個 lab 的手動 sync 流程是：
+
+```text
+修改 app/hello
+  -> git commit / push
+  -> argocd app refresh hello
+  -> argocd app diff hello
+  -> argocd app sync hello
+  -> argocd app wait hello --sync --health
+```
+
+目前沒有 CLI 時，將 refresh / diff / sync 步驟改由 Argo CD UI 執行。
+
+### 查看受 Argo 管理的 resources
+
+```bash
+kubectl get all -n demo
+kubectl get virtualservice,destinationrule -n demo
+```
+
+### History 與回滾
+
+Argo CD UI 的 `History and Rollback` 頁面可查看同步歷史。
+
+GitOps lab 優先使用 Git revert 回滾：
+
+```bash
+git revert <bad-commit>
+git push
+```
+
+Push 後，在 Argo CD UI 執行 `Refresh`，確認 diff 後執行 `Sync`。如果日後安裝 CLI，也可以使用 `argocd app refresh hello` 與 `argocd app sync hello`。
+
+這樣 Git、Argo CD 與 cluster 最終狀態保持一致。直接用 `kubectl edit` 或只在 cluster 中回滾，會造成 Git 與 live state 不一致。
+
+### 設定與事件排障
+
+```bash
+# 檢查 Application、Pod 與最近事件
+kubectl get application hello -n argocd -o yaml
+kubectl get pods -n argocd
+kubectl get events -n argocd --sort-by=.lastTimestamp
+kubectl get events -n demo --sort-by=.lastTimestamp
+
+# 分析 Istio 或其他 Kubernetes 設定問題
+kubectl get virtualservice,destinationrule -n demo
+```
+
+如果 Application 是 `OutOfSync`，先在 UI 查看 `APP DIFF`；如果日後安裝 CLI，也可以執行 `argocd app diff hello`。如果是 `Degraded` 或 rollout 未完成，再檢查 `kubectl describe pod`、Deployment events 與 container logs。
+
 ## 本次 lab 的邊界
 
 不做 automated sync policy、multi-cluster、SSO/RBAC、ApplicationSet、progressive delivery 或 rollback pipeline。這次只需要完成一個 Application 的 sync、drift 觀察與 Git revert 恢復。

@@ -307,8 +307,8 @@ istioctl analyze -n demo
 
 ## Evidence checklist
 
-- [ ] `evidence/01-istio-routing.txt`：預設 v1 與 `x-version: v2` 的實際輸出
-- [ ] `evidence/02-argocd-sync.txt`：`Synced`、`Healthy`、`OutOfSync` 狀態
+- [x] `evidence/01-istio-routing.txt`：預設 v1 與 `x-version: v2` 的實際輸出
+- [x] `evidence/02-argocd-sync.txt`：`Synced`、`Healthy`、`OutOfSync` 狀態
 - [ ] `evidence/03-prometheus-query.txt`：PromQL、查詢時間與結果摘要
 - [ ] `evidence/04-grafana-dashboard.png`：完成後放入 dashboard 截圖
 
