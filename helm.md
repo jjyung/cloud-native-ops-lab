@@ -31,6 +31,7 @@ helm upgrade --install monitoring prometheus-community/kube-prometheus-stack \
 - `monitoring/values.yaml`：保存本次 local lab 的非敏感設定。
 - `helm upgrade --install`：同一個指令可處理首次安裝與後續升級。
 - release name `monitoring`：讓 Helm 管理這組 resources 的生命週期。
+- 這個 chart 不只安裝 Prometheus，也包含 Prometheus Operator、Alertmanager、Grafana、Node Exporter 與 kube-state-metrics；完整分工見 [`prometheus.md`](./prometheus.md) 的 `kube-prometheus-stack` 章節。
 
 ## 它與 Argo CD 的關係
 

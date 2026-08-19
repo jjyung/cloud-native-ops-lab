@@ -12,6 +12,8 @@ Istio 是 service mesh；它將 service-to-service traffic policy、routing 與 
 - [Using istioctl](https://istio.io/latest/docs/ops/diagnostic-tools/istioctl/)
 - [istioctl analyze](https://istio.io/latest/docs/ops/diagnostic-tools/istioctl-analyze/)
 
+更多實務分流案例與 routing rule：參閱 [`istio-scenarios.md`](./istio-scenarios.md)。
+
 ## 三個角色
 
 | 元件 | 角色 |
