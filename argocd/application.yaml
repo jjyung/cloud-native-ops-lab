@@ -7,7 +7,7 @@ spec:
   project: default
   source:
     # Replace this placeholder with the Git remote URL for this repository.
-    repoURL: https://github.com/REPLACE_ME/cloud-native-ops-lab.git
+    repoURL: https://github.com/jjyung/cloud-native-ops-lab.git
     targetRevision: main
     path: app/hello
   destination:
