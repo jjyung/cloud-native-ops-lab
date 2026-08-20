@@ -87,6 +87,22 @@ Docker Desktop
       └─ Grafana
 ```
 
+## 經典架構參考
+
+| 編號 | 架構 | 文件 |
+|---|---|---|
+| 01 | 單體式架構 | [architecture/01-monolith](architecture/01-monolith/README.md) |
+| 02 | Cloud-Native 高併發架構 | [architecture/02-cloud-native-high-concurrency](architecture/02-cloud-native-high-concurrency/README.md) |
+| 03 | 微服務架構 | [architecture/03-microservices](architecture/03-microservices/README.md) |
+| 04 | Event-Driven 架構 | [architecture/04-event-driven](architecture/04-event-driven/README.md) |
+| 05 | Streaming 架構 | [architecture/05-streaming](architecture/05-streaming/README.md) |
+| 06 | Batch Data Pipeline | [architecture/06-batch-data-pipeline](architecture/06-batch-data-pipeline/README.md) |
+| 07 | 高可用性架構 | [architecture/07-high-availability](architecture/07-high-availability/README.md) |
+| 08 | 大數據架構 | [architecture/08-big-data](architecture/08-big-data/README.md) |
+| 09 | 手機推播架構 | [architecture/09-mobile-push](architecture/09-mobile-push/README.md) |
+| 10 | Serverless 架構 | [architecture/10-serverless](architecture/10-serverless/README.md) |
+| 11 | DevOps 架構 | [architecture/11-devops](architecture/11-devops/README.md) |
+
 ## 目錄結構
 
 ```text
